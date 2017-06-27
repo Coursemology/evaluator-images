@@ -10,6 +10,7 @@ RUN apt-get update && apt-get install -y --force-yes \
   && git clone https://github.com/google/googletest.git $HOME/googletest \
   && apt-get remove -y git \
   && apt-get autoremove -y \
+  && apt-get install -y wget \
 	&& rm -rf /var/lib/apt/lists/*
 
 # Compile GTest library so that it doesn't need to be compiled on each evaluation
@@ -23,3 +24,19 @@ RUN cd $GTEST_DIR/ \
 
 # Set env var for GoogleTest to output an xml report file
 ENV GTEST_OUTPUT xml:./report.xml
+
+# Install boost C++ library
+RUN cd $HOME/ \
+    && mkdir boost \
+    && cd boost \
+    && wget https://sourceforge.net/projects/boost/files/boost/1.64.0/boost_1_64_0.tar.gz/download \
+    && tar xvfz download \
+    && rm download \
+    && cd boost_1_64_0/ \
+    && ./bootstrap.sh \
+    && ./b2 stage threading=multi link=static \
+    && ./b2 install threading=multi link=static \
+    && cd ../../ \
+    && rm -Rf boost/
+
+ENV BOOST_DIR /usr/local/lib

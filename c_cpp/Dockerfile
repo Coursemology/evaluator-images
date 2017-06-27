@@ -6,7 +6,7 @@ MAINTAINER Coursemology <coursemology@googlegroups.com>
 ENV HOME /home/coursemology
 
 RUN apt-get update && apt-get install -y --force-yes \
-	   build-essential git \
+	build-essential git \
   && git clone https://github.com/google/googletest.git $HOME/googletest \
   && apt-get remove -y git \
   && apt-get autoremove -y \

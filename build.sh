@@ -3,8 +3,9 @@
 BASE_FOLDER=base
 CURRENT_PATH=$(pwd)
 
-# Function to build images for folders where the Dockerfile is at the top level.
+# Function to build images (without version tags) for folders where the Dockerfile is at the top level.
 # This is the case for the base and languages for which only a single version is supported.
+# Any image that differs from it should have its on build script.
 build_generic() {
   FOLDER=$1
   cd $FOLDER
@@ -20,8 +21,21 @@ build_generic() {
   cd $CURRENT_PATH
 }
 
+build() {
+  # Look for build.sh in the folder, if it doesn't exist use the generic build method.
+  FOLDER=$1
+  NEXT_PATH=$CURRENT_PATH/$FOLDER
+  if [ -f $NEXT_PATH/build.sh ]; then
+    cd $NEXT_PATH
+    bash build.sh
+    cd $CURRENT_PATH
+  else
+    build_generic $FOLDER
+  fi
+}
+
 # Build the base docker image first.
-build_generic $BASE_FOLDER
+build $BASE_FOLDER
 
 for f in $(pwd)/*;
   do
@@ -36,11 +50,5 @@ for f in $(pwd)/*;
       continue
     fi
 
-    # Look for build.sh in the folder, if it doesn't exist use the generic build method.
-    if [ -f $f/build.sh ]; then
-      cd $f
-      bash $f/build.sh
-    else
-      build_generic $FOLDER_NAME
-    fi
+    build $FOLDER_NAME
   done;

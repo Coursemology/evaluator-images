@@ -1,4 +1,4 @@
-FROM coursemology/evaluator-image-base:latest
+FROM coursemology/evaluator-image-base:jessie
 MAINTAINER Coursemology <coursemology@googlegroups.com>
 
 RUN apt-get update && apt-get install --force-yes -y wget \

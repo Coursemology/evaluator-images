@@ -1,4 +1,4 @@
-FROM coursemology/evaluator-image-base:latest
+FROM coursemology/evaluator-image-base:jessie
 MAINTAINER Coursemology <coursemology@googlegroups.com>
 
 # Set HOME variable to a location accessible by the coursemology user

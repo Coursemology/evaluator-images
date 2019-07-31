@@ -4,8 +4,8 @@ MAINTAINER Coursemology <coursemology@googlegroups.com>
 # Set HOME variable to a location accessible by the coursemology user
 ENV HOME /home/coursemology
 
-RUN echo 'deb http://http.debian.net/debian jessie-backports main' >> /etc/apt/sources.list \
-	&& apt-get update \
+RUN echo 'deb [check-valid-until=no] http://archive.debian.org/debian jessie-backports main' >> /etc/apt/sources.list \
+	&& apt-get -o Acquire::Check-Valid-Until=false update \
 	&& apt-get install -y wget \
 	&& cd $HOME \
 	&& mkdir lib \

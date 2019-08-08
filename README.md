@@ -5,7 +5,7 @@ the namespacing as used in the [polyglot](https://github.com/Coursemology/polygl
 `Coursemology::Polyglot::Language` subclasses.
 
 The images are built on top of a `base` image, which installs `make` and configures the container
-command. All other images install the required packages for that language.
+command. Base images are tagged with the OS images they are built on: Debian 8 or 10. All other images install the required packages for a particular language.
 
 ## Using the Images for Debugging
 

@@ -1,4 +1,4 @@
-FROM coursemology/evaluator-image-base:latest
+FROM coursemology/evaluator-image-base:deb8
 MAINTAINER Coursemology <coursemology@googlegroups.com>
 
 # Set HOME variable to a location accessible by the coursemology user
@@ -10,7 +10,7 @@ RUN apt-get update && apt-get install -y --force-yes \
   && git clone https://github.com/google/googletest.git $HOME/googletest \
   && apt-get remove -y git \
   && apt-get autoremove -y \
-  && apt-get install -y wget \ 
+  && apt-get install -y wget \
   && cd $HOME/ \
   && mkdir boost \
   && cd boost \

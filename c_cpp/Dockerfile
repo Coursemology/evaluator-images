@@ -35,6 +35,7 @@ ENV GTEST_DIR $HOME/googletest/googletest
 RUN cd $GTEST_DIR/ \
   && g++ -isystem ${GTEST_DIR}/include -I${GTEST_DIR} \
      -pthread -c ${GTEST_DIR}/src/gtest-all.cc \
+     -std=c++11 \
   && ar -rv libgtest.a gtest-all.o
 
 # Set env var for GoogleTest to output an xml report file

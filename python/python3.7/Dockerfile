@@ -21,8 +21,7 @@ RUN apt-get update && apt-get install --force-yes -y wget \
   && pip3 install scipy \
   && pip3 install matplotlib \
   && pip3 install pandas \
-  && pip3 install torch \
-  && pip3 install torchvision \
+  && pip3 install torch torchvision \
   && cd /root \
   && rm -r /root/Python-3.7.2 \
   && rm -r /root/Python-3.7.2.tgz \

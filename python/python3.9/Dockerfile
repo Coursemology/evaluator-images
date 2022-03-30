@@ -5,8 +5,8 @@ ENV LDFLAGS="-L/usr/local/lib/" \
     LD_LIBRARY_PATH="/usr/local/lib/" \
     CPPFLAGS="-I/usr/local/include -I/usr/local/include/openssl"
 RUN apt-get update && apt-get install --force-yes -y wget \
-  build-essential libssl-dev zlib1g-dev libbz2-dev libffi-dev git libsqlite3-dev \
-  && wget -qO- https://www.openssl.org/source/openssl-1.0.2g.tar.gz | tar xz && cd openssl-1.0.2g && ./config shared --prefix=/usr/local/ && make && make install \
+  build-essential libssl-dev zlib1g-dev libbz2-dev libffi-dev git libsqlite3-dev liblzma-dev \
+  && wget --no-check-certificate -qO- https://www.openssl.org/source/openssl-1.1.1m.tar.gz | tar xz && cd openssl-1.1.1m && ./config shared --prefix=/usr/local/ && make && make install \
   && cd /root \
   && wget https://www.python.org/ftp/python/3.9.6/Python-3.9.6.tgz \
   && tar xzf Python-3.9.6.tgz \

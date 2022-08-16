@@ -7,6 +7,26 @@ the namespacing as used in the [polyglot](https://github.com/Coursemology/polygl
 The images are built on top of a `base` image, which installs `make` and configures the container
 command. Base images are tagged with the OS images they are built on: Debian 8 or 10. All other images install the required packages for a particular language.
 
+# Creating an Image for Deployment
+
+Each image should have its own folder/subfolder.
+
+For Python, it can be found in `python/pythonX.X` where `X.X` is the version number.  
+You can build the `Dockerfile` locally by entering into the directory and executing the `docker build` command.
+
+```sh
+docker build -t coursemology/evaluator-image-<language>:<version> .
+```
+
+Once built and tested, you can push to [dockerhub](https://hub.docker.com/u/coursemology).  
+You will need to `docker login` using the dockerhub credentials.
+
+```sh
+docker push coursemology/evaluator-image-<language>:<version>
+```
+
+The image 
+
 ## Using the Images for Debugging
 
 If your code cannot pass Coursemology's autograder, you can manually simulate the autograding process with these Docker images to help with debugging.

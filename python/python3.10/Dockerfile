@@ -1,4 +1,4 @@
-FROM coursemology/evaluator-image-base:deb10-new
+FROM coursemology/evaluator-image-base:deb10
 LABEL maintainer="Coursemology <coursemology@googlegroups.com>"
 
 ENV LDFLAGS="-L/usr/local/lib/" \

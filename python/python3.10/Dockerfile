@@ -19,6 +19,7 @@ RUN pip3 install --no-cache-dir git+https://github.com/Coursemology/unittest-xml
   && pip3 --no-cache-dir install numpy scipy matplotlib \
   && pip3 --no-cache-dir install pandas sklearn
 RUN pip3 install --no-cache-dir torch==1.12.1+cpu torchvision==0.13.1+cpu -f https://download.pytorch.org/whl/torch_stable.html
+RUN pip3 install --no-cache-dir keras==2.9.0 tensorflow-cpu==2.9.2
 RUN cd /root \
   && rm -r /root/Python-3.10.6 \
   && rm -r /root/Python-3.10.6.tgz \

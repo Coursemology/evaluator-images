@@ -17,7 +17,7 @@ RUN apt-get update && apt-get install -y wget \
   && cd /root \
   && rm -r /root/Python-3.12.1 \
   && rm -r /root/Python-3.12.1.tgz \
-  && pip3 install --no-cache-dir git+https://github.com/Coursemology/unittest-xml-reporting.git@extra-attributes \
+  && pip3 install --no-cache-dir git+https://github.com/Coursemology/unittest-xml-reporting.git@extra-attributes-2024 \
   && apt-get remove -y git wget \
   && rm -rf /var/lib/apt/lists/*
 RUN pip3 --no-cache-dir install timeout-decorator Pillow networkx fnss\

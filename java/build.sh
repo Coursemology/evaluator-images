@@ -12,7 +12,7 @@ build() {
   echo "IN $(pwd)"
   echo "Building $IMAGE_NAME"
 
-  docker build -t $IMAGE_NAME .
+  docker build --platform linux/x86_64 -t $IMAGE_NAME .
 }
 
 # Iterate over all java folders and build with tag X

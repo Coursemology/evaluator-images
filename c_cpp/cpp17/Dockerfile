@@ -1,26 +1,30 @@
-FROM coursemology/evaluator-image-base:deb8
-MAINTAINER Coursemology <coursemology@googlegroups.com>
+FROM coursemology/evaluator-image-base:deb12
+LABEL org.opencontainers.image.authors="Coursemology <coursemology@googlegroups.com>"
 
 # Set HOME variable to a location accessible by the coursemology user
 # Needed to clone GoogleTest framework to a location accessible by the coursemology user.
 ENV HOME /home/coursemology
+ENV CXX_STD="c++17"
 
-RUN apt-get update && apt-get install -y --force-yes \
+RUN apt-get update && apt-get install -y \
 	build-essential git \
   && git clone https://github.com/google/googletest.git $HOME/googletest \
+  && cd $HOME/googletest \
+  # Most recent commit as of Dec 18, 2024
+  && git checkout f3c355f9dd382bc2c323be2713e351a578b68c61 \
   && apt-get remove -y git \
   && apt-get autoremove -y \
   && apt-get install -y wget \
-  && cd $HOME/ \
+  && cd ../ \
   && mkdir boost \
   && cd boost \
-  && wget https://sourceforge.net/projects/boost/files/boost/1.64.0/boost_1_64_0.tar.gz/download \
-  && tar xvfz download \
-  && rm download \
-  && cd boost_1_64_0/ \
+  && wget https://boostorg.jfrog.io/artifactory/main/release/1.87.0/source/boost_1_87_0.tar.gz \
+  && tar xvfz boost_1_87_0.tar.gz \
+  && rm boost_1_87_0.tar.gz \
+  && cd boost_1_87_0/ \
   && ./bootstrap.sh \
-  && ./b2 stage threading=multi link=static \
-  && ./b2 install threading=multi link=static \
+  && ./b2 cxxflags="--std=${CXX_STD}" stage threading=multi link=static \
+  && ./b2 cxxflags="--std=${CXX_STD}" install threading=multi link=static \
   && cd ../../ \
   && rm -Rf boost/ \
   && apt-get remove -y wget \
@@ -35,7 +39,7 @@ ENV GTEST_DIR $HOME/googletest/googletest
 RUN cd $GTEST_DIR/ \
   && g++ -isystem ${GTEST_DIR}/include -I${GTEST_DIR} \
      -pthread -c ${GTEST_DIR}/src/gtest-all.cc \
-     -std=c++11 \
+     -std=${CXX_STD} \
   && ar -rv libgtest.a gtest-all.o
 
 # Set env var for GoogleTest to output an xml report file

@@ -1,0 +1,115 @@
+version: 2.1
+
+orbs:
+  aws-cli: circleci/aws-cli@4.0
+
+commands:
+  aws_login:
+    parameters:
+      AWS_ROLE_ARN:
+        type: string
+    steps:
+      - aws-cli/setup:
+          role_arn: << parameters.AWS_ROLE_ARN >>
+
+  list_existing_archives:
+    parameters:
+      S3_EVALUATOR_IMAGE_BUCKET:
+        type: string
+    steps:
+      - run:
+          name: Get list of existing archives
+          command: |
+            aws s3 ls s3://<< parameters.S3_EVALUATOR_IMAGE_BUCKET >> > existing_evaluator_images.list
+
+  docker_login:
+    parameters:
+      DOCKER_USERNAME:
+        type: string
+      DOCKER_PASSWORD:
+        type: string
+    steps:
+      - run:
+          name: docker login
+          command: docker login -u << parameters.DOCKER_USERNAME >> -p << parameters.DOCKER_PASSWORD >>
+
+  save_docker_archive:
+    steps:
+      - run:
+          name: Pull evaluator images and save to local archives
+          command: |
+            while read image; do
+              ARCHIVE_NAME=$(echo "$image" | sed -E 's|coursemology/||; s|:|_|; s|\.|_|').tar.gz
+             
+              if grep -q "$ARCHIVE_NAME" existing_evaluator_images.list; then
+                echo "Archive $ARCHIVE_NAME already exists"
+                continue
+              fi
+
+              echo "Creating archive $ARCHIVE_NAME"
+              docker pull "$image"
+              docker save "$image" | pigz --fast > "$ARCHIVE_NAME"
+            done < evaluator-images.list
+
+  upload_archive_to_aws:
+    parameters:
+      S3_EVALUATOR_IMAGE_BUCKET:
+        type: string
+    steps:
+      - run:
+          name: Upload image archives to S3
+          command: |
+            for archive in ./*.tar.gz; do
+              [ -e "$archive" ] || continue
+              aws s3 cp $archive s3://<< parameters.S3_EVALUATOR_IMAGE_BUCKET >> --copy-props none
+            done
+
+jobs:
+  save-and-upload-to-staging:
+    machine:
+      image: ubuntu-2204:2024.01.1
+    resource_class: large
+    steps:
+      - checkout
+      - aws_login:
+          AWS_ROLE_ARN: ${AWS_STAGING_ROLE_ARN}
+      - list_existing_archives:
+          S3_EVALUATOR_IMAGE_BUCKET: ${AWS_STAGING_S3_EVALUATOR_IMAGE_BUCKET}
+      - docker_login:
+          DOCKER_USERNAME: ${DOCKER_USERNAME}
+          DOCKER_PASSWORD: ${DOCKER_PASSWORD}
+      - save_docker_archive
+      - upload_archive_to_aws:
+          S3_EVALUATOR_IMAGE_BUCKET: ${AWS_STAGING_S3_EVALUATOR_IMAGE_BUCKET}
+
+  save-and-upload-to-production:
+    machine:
+      image: ubuntu-2204:2024.01.1
+    resource_class: large
+    steps:
+      - checkout
+      - aws_login:
+          AWS_ROLE_ARN: ${AWS_PRODUCTION_ROLE_ARN}
+      - list_existing_archives:
+          S3_EVALUATOR_IMAGE_BUCKET: ${AWS_PRODUCTION_S3_EVALUATOR_IMAGE_BUCKET}
+      - docker_login:
+          DOCKER_USERNAME: ${DOCKER_USERNAME}
+          DOCKER_PASSWORD: ${DOCKER_PASSWORD}
+      - save_docker_archive
+      - upload_archive_to_aws:
+          S3_EVALUATOR_IMAGE_BUCKET: ${AWS_PRODUCTION_S3_EVALUATOR_IMAGE_BUCKET}
+
+workflows:
+  version: 2
+  save-and-upload:
+    jobs:
+      - save-and-upload-to-staging:
+          filters:
+            branches:
+              ignore:
+                - master
+      - save-and-upload-to-production:
+          filters:
+            branches:
+              only:
+                - master

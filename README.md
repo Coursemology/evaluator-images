@@ -123,3 +123,17 @@ Cleaning up if the prepared file has been messed up:
 ```
 make clean
 ```
+
+## Deployment of Evaluator Images
+
+Each programming language supported by Coursemology's default evaluator requires its corresponding Docker image to be preloaded on worker instances. If the image is absent, it will be loaded as part of the autograding job, which will adversely effect its runtime.
+
+The [evaluator-images.list](./evaluator-images.list) file contains the list of all evaluator images currently in use. Whenever a new evaluator image is created, add it to this file as a new entry.
+
+
+Whenever a pull request is created, a CircleCI orb will sync the images listed in the file with a storage bucket in our AWS S3 staging environment. If an image archive doesn't exist in the bucket yet, it will pulls the image, run `docker save` to create a .tar.gz archive for it, then upload it to the bucket. During deployment of our worker instances, our evaluator images are loaded from the bucket instead of calling `docker pull`.
+
+When the pull request is merged, the same process happens in our production environment. 
+
+
+In exceptional circumstances where we need to patch an existing evaluator image and update its archive, the old archive must be manually deleted.

@@ -130,10 +130,10 @@ Each programming language supported by Coursemology's default evaluator requires
 
 The [evaluator-images.list](./evaluator-images.list) file contains the list of all evaluator images currently in use. Whenever a new evaluator image is created, add it to this file as a new entry.
 
+The new docker container must be pushed to Docker Hub **before** the PR updating this repository is created.
 
 Whenever a pull request is created, a CircleCI orb will sync the images listed in the file with a storage bucket in our AWS S3 staging environment. If an image archive doesn't exist in the bucket yet, it will pulls the image, run `docker save` to create a .tar.gz archive for it, then upload it to the bucket. During deployment of our worker instances, our evaluator images are loaded from the bucket instead of calling `docker pull`.
 
 When the pull request is merged, the same process happens in our production environment. 
 
-
-In exceptional circumstances where we need to patch an existing evaluator image and update its archive, the old archive must be manually deleted.
+In exceptional circumstances where we need to patch an existing evaluator image and update its archive, the updated image must be pushed to Docker Hub and the old archive must be manually deleted from staging and production buckets. **Doing this to an in-use container tag is potentially breaking for Coursemology users**, so it should only be done when absolutely necessary.
